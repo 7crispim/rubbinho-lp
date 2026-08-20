@@ -108,6 +108,18 @@
     width:100%; height:auto;
     opacity:0; animation: fadeUp .9s var(--ease) .05s forwards;
   }
+  /* Desktop: o banner é 1,6:1 e em tela larga fica alto demais, empurrando os
+     botões pra fora da primeira dobra. Limita a altura à viewport e corta pela
+     base — que é onde o degradê escuro dos botões já cobre a arte. */
+  @media (min-width: 46rem){
+    .hero-banner img{
+      height: calc(100svh - 3rem);
+      max-height: 52rem;
+      object-fit: cover;
+      object-position: 50% 38%;
+      min-height: 30rem;
+    }
+  }
   /* chips + botões sobrepostos na parte de baixo do banner */
   .hero-actions-wrap{
     position:absolute; left:0; right:0; bottom:0;
