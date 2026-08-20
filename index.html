@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cozinha do Rubbinho</title>
+<meta name="description" content="Cardápio digital da Cozinha do Rubbinho — comida caseira em Águas Claras, DF. Pratos executivos, parmegianas, ofertas de quarta, bebidas e marmitex.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@600;700&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #17110d;
+    --ink-2: #241a13;
+    --paper: #faf3e6;
+    --paper-dim: #f0e4cd;
+    --red: #7c1b22;
+    --red-bright: #a4212a;
+    --gold: #d9a441;
+    --gold-soft: #f0cf8f;
+    --text-dark: #241a13;
+    --text-dim: #6b5a3f;
+    --text-light: #f6ecd9;
+    --shadow: 0 1.2rem 2.4rem -1rem rgba(23,17,13,0.35);
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{ box-sizing:border-box; }
+  html{
+    font-size: clamp(15px, 0.85vw + 11px, 18px);
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--text-dark);
+    font-family:'Work Sans', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{ max-width:100%; display:block; }
+  a{ color:inherit; }
+  h1,h2,h3{ text-wrap:balance; margin:0; }
+  .skip-link{
+    position:absolute; top:-3rem; left:1rem; z-index:200;
+    background:var(--gold); color:var(--ink); padding:0.6rem 1rem;
+    border-radius:0.4rem; font-weight:700; text-decoration:none;
+    transition: top .2s var(--ease);
+  }
+  .skip-link:focus{ top:1rem; }
+  :focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+  .container{ width:100%; max-width:72rem; margin:0 auto; padding:0 1.4rem; }
+
+  /* ---------- reveal-on-scroll ----------
+     Só esconde se o JS estiver rodando (html.js). Sem JS, ou se o
+     IntersectionObserver falhar, o conteúdo aparece normalmente. */
+  .js .reveal{
+    opacity:0; transform: translateY(1.4rem);
+    transition: opacity .7s var(--ease), transform .7s var(--ease);
+    transition-delay: calc(var(--d, 0) * 70ms);
+  }
+  .js .reveal.in{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){
+    .js .reveal{ opacity:1; transform:none; transition:none; }
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:80;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:1rem; padding:0.7rem 1.4rem;
+    background: rgb(23,17,13);
+    border-bottom:1px solid rgba(217,164,65,0.25);
+    transform: translateY(-110%);
+    transition: transform .45s var(--ease);
+  }
+  .topbar.shown{ transform:translateY(0); }
+  .topbar-brand{ display:flex; align-items:center; gap:0.6rem; text-decoration:none; min-width:0; }
+  .topbar-brand img{ height:2.1rem; width:auto; flex:none; }
+  .topbar-brand span{
+    font-family:'Anton', sans-serif; color:var(--text-light);
+    font-size:0.95rem; letter-spacing:0.03em; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis;
+  }
+  .topbar-cta{
+    flex:none;
+    background:var(--red); color:var(--text-light); border:1px solid var(--gold);
+    font-family:'Work Sans', sans-serif; font-weight:700; font-size:0.8rem;
+    padding:0.55rem 1.05rem; border-radius:999px; cursor:pointer;
+    transition: transform .2s var(--ease), background .2s var(--ease);
+  }
+  .topbar-cta:hover{ background:var(--red-bright); transform:translateY(-1px); }
+  @media (max-width: 30rem){
+    .topbar-brand span{ font-size:0.8rem; }
+    .topbar-cta{ font-size:0.72rem; padding:0.5rem 0.85rem; }
+  }
+
+  /* ---------- hero (banner é peça fechada: mostrar inteiro) ---------- */
+  /* .hero e .marmitex são <section>: precisam zerar o padding da regra genérica abaixo */
+  .hero{ position:relative; background: var(--ink); padding:0; }
+  .hero-banner{ display:block; }   /* <picture> é inline por padrão e cria um vão abaixo da imagem */
+  .hero-banner img{
+    width:100%; height:auto;
+    opacity:0; animation: fadeUp .9s var(--ease) .05s forwards;
+  }
+  /* chips + botões sobrepostos na parte de baixo do banner */
+  .hero-actions-wrap{
+    position:absolute; left:0; right:0; bottom:0;
+    background: linear-gradient(180deg,
+      rgba(23,17,13,0) 0%, rgba(23,17,13,0.55) 25%,
+      rgba(23,17,13,0.88) 55%, rgba(23,17,13,0.97) 100%);
+    padding: 5rem 1.4rem 1.6rem;
+    display:flex; flex-direction:column; align-items:center; gap:0.85rem;
+    text-align:center;
+  }
+  .hero-chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:0.5rem; }
+  .hero-chip{
+    margin:0; display:inline-flex; align-items:center; gap:0.4rem;
+    background:rgba(23,17,13,0.55); border:1px solid rgba(217,164,65,0.5);
+    padding:0.45rem 1rem; border-radius:999px;
+    font-size:0.8rem; color:var(--text-light); letter-spacing:0.04em;
+    backdrop-filter: blur(3px);
+    opacity:0; animation: fadeUp .8s var(--ease) .3s forwards;
+  }
+  .hero-actions{
+    display:flex; flex-wrap:wrap; gap:0.8rem; justify-content:center;
+    opacity:0; animation: fadeUp .8s var(--ease) .45s forwards;
+  }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(1rem); } to{ opacity:1; transform:none; } }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:0.5rem;
+    font-family:'Work Sans', sans-serif; font-weight:700; font-size:0.9rem;
+    padding:0.9rem 1.5rem; border-radius:999px; border:1px solid transparent;
+    cursor:pointer; text-decoration:none;
+    transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+  }
+  .btn:hover{ transform: translateY(-2px); }
+  .btn-primary{ background:var(--red); color:var(--text-light); border-color:var(--gold); box-shadow:0 0.6rem 1.4rem -0.5rem rgba(164,33,42,0.7); }
+  .btn-primary:hover{ background:var(--red-bright); }
+  /* fica sobre a foto do banner: precisa de fundo próprio pra ter contraste */
+  .btn-ghost{ background:rgba(23,17,13,0.6); color:var(--text-light); border-color:rgba(240,207,143,0.7); backdrop-filter: blur(3px); }
+  .btn-ghost:hover{ background:rgba(23,17,13,0.85); }
+
+  /* ---------- category nav ---------- */
+  .catnav-wrap{
+    position:sticky; top:0; z-index:60;
+    background:var(--paper); border-bottom:1px solid rgba(124,27,34,0.15);
+  }
+  .catnav{
+    display:flex; gap:0.4rem; overflow-x:auto; padding:0.85rem 1.4rem;
+    scrollbar-width:none;
+  }
+  .catnav::-webkit-scrollbar{ display:none; }
+  .catnav a{
+    flex:none; text-decoration:none; white-space:nowrap;
+    font-size:0.82rem; font-weight:600; color:var(--text-dim);
+    padding:0.5rem 0.9rem; border-radius:999px;
+    border:1px solid transparent;
+    transition: color .2s, background .2s, border-color .2s;
+  }
+  .catnav a:hover{ color:var(--red); }
+  .catnav a.active{ color:var(--red); background:var(--paper-dim); border-color:rgba(124,27,34,0.2); }
+
+  /* ---------- sections ---------- */
+  section{ padding: 3.4rem 0; }
+  section.alt{ background:var(--paper-dim); }
+  .section-head{ max-width:38rem; margin-bottom:1.8rem; }
+  .eyebrow{
+    display:block; font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--red); font-weight:700; margin-bottom:0.4rem;
+  }
+  .section-title{
+    font-family:'Anton', sans-serif; font-size:clamp(1.7rem, 1vw + 1.4rem, 2.3rem);
+    color:var(--ink); letter-spacing:0.01em;
+  }
+
+  .grid{
+    display:grid; gap:1.3rem;
+    grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  }
+
+  .card{
+    background:#fff; border-radius:1rem; overflow:hidden;
+    box-shadow: var(--shadow);
+    display:flex; flex-direction:column;
+    transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+  }
+  .card:hover{ transform: translateY(-0.35rem); box-shadow:0 1.6rem 3rem -1rem rgba(23,17,13,0.4); }
+  .card-photo{ position:relative; aspect-ratio:1/1; overflow:hidden; background:var(--paper-dim); }
+  .card-photo img{
+    width:100%; height:100%; object-fit:cover;
+    transition: transform .5s var(--ease);
+  }
+  .card:hover .card-photo img{ transform:scale(1.07); }
+  .card-body{ padding:1rem 1.1rem 1.2rem; display:flex; flex-direction:column; gap:0.3rem; flex:1; }
+  .card-row{ display:flex; align-items:baseline; justify-content:space-between; gap:0.6rem; }
+  .card-name{ font-weight:700; font-size:1rem; color:var(--ink); line-height:1.25; }
+  .card-price{
+    font-weight:800; font-size:1rem; color:var(--red-bright);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .card-note{ font-size:0.76rem; font-style:italic; color:var(--text-dim); line-height:1.45; margin:0.1rem 0 0; }
+
+  /* ---------- prato do dia ---------- */
+  .dailyband{
+    background:
+      radial-gradient(120% 140% at 15% 0%, #2a1e14 0%, var(--ink) 60%),
+      var(--ink);
+    color:var(--text-light);
+    padding:3.6rem 1.4rem;
+  }
+  .dailyband-inner{
+    max-width:56rem; margin:0 auto;
+    display:grid; grid-template-columns:1fr; gap:1.8rem; align-items:center;
+    text-align:center; justify-items:center;
+  }
+  .dailyband-photo{
+    width:min(17rem, 70vw); aspect-ratio:1/1; border-radius:50%; overflow:hidden;
+    border:0.3rem solid var(--gold); box-shadow:0 1.4rem 3rem -1rem rgba(0,0,0,0.7);
+  }
+  .dailyband-photo img{ width:100%; height:100%; object-fit:cover; }
+  .dailyband-label{
+    font-family:'Caveat', cursive; font-size:2.6rem; color:var(--gold-soft);
+    display:block; transform:rotate(-1.5deg); line-height:1;
+  }
+  .dailyband-text{ margin:0.6rem 0 1.4rem; font-size:1rem; color:var(--paper-dim); }
+  @media (min-width: 46rem){
+    .dailyband-inner{ grid-template-columns: auto 1fr; text-align:left; justify-items:start; gap:2.6rem; }
+    .dailyband-photo{ width:15rem; }
+  }
+
+  /* ---------- marmitex band ---------- */
+  .marmitex{
+    display:grid; grid-template-columns: 1fr; gap:0;
+    background:var(--ink-2); padding:0;
+  }
+  .marmitex-photo{ aspect-ratio:16/10; overflow:hidden; }
+  .marmitex-photo img{ width:100%; height:100%; object-fit:cover; }
+  .marmitex-copy{
+    padding:2.6rem 1.4rem; color:var(--text-light); text-align:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.9rem;
+  }
+  .marmitex-title{ font-family:'Anton', sans-serif; font-size:1.9rem; color:var(--gold-soft); }
+  .marmitex-copy p{ max-width:26rem; margin:0; color:var(--paper-dim); font-size:0.95rem; }
+  @media (min-width: 52rem){
+    .marmitex{ grid-template-columns: 1fr 1fr; align-items:stretch; }
+    .marmitex-photo{ aspect-ratio:auto; }
+  }
+
+  /* ---------- onde estamos + footer ---------- */
+  .local{
+    background:var(--ink); color:var(--text-light);
+    padding:3.4rem 1.4rem 1rem; text-align:center;
+  }
+  .local-title{
+    font-family:'Anton', sans-serif; font-size:1.7rem; color:var(--gold-soft);
+    margin-bottom:0.5rem;
+  }
+  .local-address{
+    font-size:0.9rem; color:var(--paper-dim); line-height:1.55;
+    max-width:26rem; margin:0 auto 0.6rem; font-style:normal;
+  }
+  .local-hours{
+    margin:0 auto 1.8rem; font-size:0.85rem; font-weight:600;
+    color:var(--gold-soft); letter-spacing:0.03em;
+  }
+  .local-grid{
+    display:grid; gap:1rem; max-width:60rem; margin:0 auto;
+    grid-template-columns:1fr;
+  }
+  @media (min-width: 40rem){
+    .local-grid{ grid-template-columns: repeat(3, 1fr); }
+  }
+  .local-shot{
+    border-radius:0.9rem; overflow:hidden; border:1px solid rgba(217,164,65,0.3);
+    aspect-ratio:4/3; background:var(--ink-2);
+  }
+  .local-shot img{ width:100%; height:100%; object-fit:cover; transition:transform .5s var(--ease); }
+  .local-shot:hover img{ transform:scale(1.05); }
+  .local-map{
+    position:relative; display:block; text-decoration:none;
+    border-radius:0.9rem; overflow:hidden; border:1px solid rgba(217,164,65,0.55);
+    aspect-ratio:4/3; background:#e8e0d5;
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .local-map:hover{ transform:translateY(-3px); box-shadow:0 1rem 2rem -0.7rem rgba(0,0,0,0.6); }
+  .local-map img{ width:100%; height:100%; object-fit:cover; }
+  .local-map-label{
+    position:absolute; left:0; right:0; bottom:0;
+    background:linear-gradient(180deg, rgba(23,17,13,0) 0%, rgba(23,17,13,0.88) 55%);
+    color:var(--text-light); font-size:0.78rem; font-weight:700;
+    padding:1.6rem 0.7rem 0.7rem;
+    display:flex; align-items:center; justify-content:center; gap:0.35rem;
+  }
+
+  footer{
+    background:var(--ink); color:var(--text-light);
+    padding:2.4rem 1.4rem 2.2rem; text-align:center;
+  }
+  .footer-logo{ width:9rem; height:auto; margin:0 auto 1.1rem; }
+  .footer-phone{
+    display:inline-flex; align-items:center; gap:0.4rem;
+    font-size:0.95rem; color:var(--paper-dim); text-decoration:none; margin-bottom:1.2rem;
+  }
+  .footer-phone:hover{ color:var(--gold-soft); }
+  .footer-meta{ margin-top:1.8rem; font-size:0.72rem; color:rgba(246,236,217,0.5); }
+
+  /* ---------- floating CTA (mobile) ----------
+     Só aparece depois do hero, pra não competir com o CTA de cima. */
+  .fab{ position:fixed; right:1rem; bottom:1rem; z-index:70; display:none; }
+  @media (max-width: 40rem){
+    .fab{
+      display:block;
+      opacity:0; visibility:hidden; transform:translateY(0.8rem);
+      transition: opacity .35s var(--ease), transform .35s var(--ease), visibility .35s;
+    }
+    .fab.shown{ opacity:1; visibility:visible; transform:none; }
+  }
+
+  /* ---------- modal ---------- */
+  dialog#orderModal{
+    border:none; border-radius:1.1rem; padding:0;
+    width:min(30rem, calc(100vw - 2rem));
+    background:var(--paper); color:var(--text-dark);
+    box-shadow:0 2rem 5rem -1rem rgba(0,0,0,0.5);
+  }
+  dialog#orderModal::backdrop{ background:rgba(17,12,8,0.7); }
+  .modal-inner{ padding:1.6rem 1.5rem 1.8rem; }
+  .modal-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:1.1rem; }
+  .modal-title{ font-family:'Anton', sans-serif; font-size:1.4rem; color:var(--ink); }
+  .modal-sub{ margin:0.25rem 0 0; font-size:0.82rem; color:var(--text-dim); }
+  .modal-close{
+    background:none; border:none; cursor:pointer; font-size:1.4rem; line-height:1;
+    color:var(--text-dim); padding:0.2rem 0.4rem; border-radius:0.4rem;
+  }
+  .modal-close:hover{ color:var(--red); }
+  .modal-options{ display:flex; flex-direction:column; gap:0.8rem; }
+  .modal-option{
+    display:flex; align-items:center; gap:0.9rem;
+    padding:1rem; border-radius:0.8rem; border:1px solid rgba(124,27,34,0.15);
+    background:#fff; text-decoration:none; color:var(--text-dark);
+    transition: transform .2s var(--ease), border-color .2s, box-shadow .2s;
+  }
+  .modal-option:hover{ transform:translateY(-2px); border-color:var(--gold); box-shadow:var(--shadow); }
+  .modal-option-icon{
+    flex:none; width:2.8rem; height:2.8rem; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--paper-dim); font-size:1.3rem;
+  }
+  .modal-option-text strong{ display:block; font-size:0.95rem; }
+  .modal-option-text span{ display:block; font-size:0.78rem; color:var(--text-dim); margin-top:0.1rem; }
+
+  dialog#orderModal[open]{ animation: modalIn .3s var(--ease); }
+  @keyframes modalIn{ from{ opacity:0; transform:scale(0.94) translateY(0.5rem); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ dialog#orderModal[open]{ animation:none; } }
+
+  /* No mobile o banner é retrato e tem texto até embaixo: o overlay precisa ser
+     compacto pra não cobrir a headline da peça. */
+  @media (max-width: 46rem){
+    .hero-actions-wrap{ padding: 3.5rem 0.9rem 1rem; gap:0.6rem; }
+    .hero-chip{ font-size:0.72rem; padding:0.35rem 0.75rem; }
+    .hero-actions{ gap:0.5rem; }
+    .hero-actions .btn{ font-size:0.82rem; padding:0.7rem 1.1rem; }
+  }
+  @media (max-width: 20rem){
+    .hero-actions{ flex-direction:column; align-items:stretch; width:100%; }
+    .hero-actions .btn{ justify-content:center; }
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+<a class="skip-link" href="#cardapio">Pular para o cardápio</a>
+
+<header class="topbar" id="topbar">
+  <a class="topbar-brand" href="#top">
+    <img src="img/logo.webp" alt="" width="900" height="507">
+    <span>Cozinha do Rubbinho</span>
+  </a>
+  <button class="topbar-cta" type="button" data-open-modal>Faça seu pedido</button>
+</header>
+
+<div id="top"></div>
+<section class="hero" aria-label="Abertura">
+  <picture class="hero-banner">
+    <source media="(max-width: 46rem)" srcset="img/hero-mobile.webp">
+    <img src="img/hero-desktop.webp" alt="Cozinha do Rubbinho — comida farta, preço justo e feita com carinho. Águas Claras, DF." width="1586" height="992" fetchpriority="high">
+  </picture>
+  <div class="hero-actions-wrap">
+    <div class="hero-chips">
+      <p class="hero-chip">📍 Águas Claras, DF</p>
+      <p class="hero-chip">🕚 Seg a Sáb, 11h às 14h</p>
+    </div>
+    <div class="hero-actions">
+      <button class="btn btn-primary" type="button" data-open-modal>Faça seu pedido</button>
+      <a class="btn btn-ghost" href="#cardapio">Ver cardápio</a>
+    </div>
+  </div>
+</section>
+
+<div class="catnav-wrap">
+  <nav class="catnav" id="catnav" aria-label="Categorias do cardápio">
+    <a href="#executivos">Executivos</a>
+    <a href="#parmegianas">Parmegianas</a>
+    <a href="#quarta">Quarta-feira</a>
+    <a href="#bebidas">Bebidas</a>
+    <a href="#prato-do-dia">Prato do dia</a>
+    <a href="#marmitex">Marmitex</a>
+  </nav>
+</div>
+
+<main id="cardapio">
+
+  <section id="executivos">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Cardápio</span>
+        <h2 class="section-title">Pratos Executivos</h2>
+      </div>
+      <div class="grid">
+        <article class="card reveal" style="--d:0">
+          <div class="card-photo"><img src="img/picanha.webp" alt="Picanha com arroz, feijão, batata frita, alface e tomate" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Picanha</span><span class="card-price">R$35</span></div>
+            <p class="card-note">(Picanha grelhada, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:1">
+          <div class="card-photo"><img src="img/file-tilapia.webp" alt="Filé de tilápia com arroz, purê e salada" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Filé de Tilápia</span><span class="card-price">R$35</span></div>
+            <p class="card-note">(Filé de tilápia, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:2">
+          <div class="card-photo"><img src="img/bife-acebolado.webp" alt="Bife acebolado com arroz, feijão, batata frita e salada" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Bife Acebolado</span><span class="card-price">R$30</span></div>
+            <p class="card-note">(Bife acebolado, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:3">
+          <div class="card-photo"><img src="img/frango-completo.webp" alt="Filé de frango grelhado com arroz, feijão, batata frita e salada" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Filé de Frango Completo</span><span class="card-price">R$30</span></div>
+            <p class="card-note">(Filé de frango grelhado, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:4">
+          <div class="card-photo"><img src="img/frango-simples.webp" alt="Filé de frango grelhado com arroz e purê" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Filé de Frango Simples</span><span class="card-price">R$25</span></div>
+            <p class="card-note">(Filé de frango grelhado, arroz e fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:5">
+          <div class="card-photo"><img src="img/vegetariano-coalho.webp" alt="Prato vegetariano com queijo coalho grelhado, arroz, feijão e salada" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Vegetariano c/ Queijo Coalho</span><span class="card-price">R$25</span></div>
+            <p class="card-note">(Queijo coalho grelhado, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="parmegianas" class="alt">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2 class="section-title">Parmegianas</h2>
+      </div>
+      <div class="grid">
+        <article class="card reveal" style="--d:0">
+          <div class="card-photo"><img src="img/parmegiana-carne.webp" alt="Parmegiana de carne com molho vermelho, queijo, arroz e fritas" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Parmegiana de Carne</span><span class="card-price">R$40</span></div>
+            <p class="card-note">(Bife empanado com molho e queijo, arroz, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:1">
+          <div class="card-photo"><img src="img/parmegiana-tilapia.webp" alt="Parmegiana de tilápia com molho, queijo, arroz e purê" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Parmegiana de Tilápia</span><span class="card-price">R$40</span></div>
+            <p class="card-note">(Filé de tilápia empanado com molho e queijo, arroz, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:2">
+          <div class="card-photo"><img src="img/parmegiana-frango.webp" alt="Parmegiana de frango com molho, queijo, arroz e purê" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Parmegiana de Frango</span><span class="card-price">R$30</span></div>
+            <p class="card-note">(Filé de frango empanado com molho e queijo, arroz, fritas ou purê)</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="quarta">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Toda quarta-feira</span>
+        <h2 class="section-title">Ofertas de Quarta-feira</h2>
+      </div>
+      <div class="grid">
+        <article class="card reveal" style="--d:0">
+          <div class="card-photo"><img src="img/figado-acebolado.webp" alt="Bife de fígado acebolado com arroz, feijão, fritas e salada" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Bife de Fígado Acebolado</span><span class="card-price">R$20</span></div>
+            <p class="card-note">(Fígado acebolado, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:1">
+          <div class="card-photo"><img src="img/bisteca-suina.webp" alt="Bisteca suína com arroz, feijão, batata frita e salada" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Bisteca Suína</span><span class="card-price">R$20</span></div>
+            <p class="card-note">(Bisteca suína, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:2">
+          <div class="card-photo"><img src="img/vegetariano-ovos.webp" alt="Prato vegetariano com dois ovos, arroz, feijão, fritas e salada" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Vegetariano com 2 Ovos</span><span class="card-price">R$20</span></div>
+            <p class="card-note">(2 ovos, arroz, feijão, alface e tomate, fritas ou purê)</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="bebidas" class="alt">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2 class="section-title">Bebidas</h2>
+      </div>
+      <div class="grid">
+        <article class="card reveal" style="--d:0">
+          <div class="card-photo"><img src="img/bebida-refri-2l.webp" alt="Refrigerantes em garrafa de 2 litros" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Refrigerantes 2L</span><span class="card-price">R$12</span></div>
+            <p class="card-note">(Coca-cola, Guaraná e Sprite)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:1">
+          <div class="card-photo"><img src="img/bebida-refri-lata.webp" alt="Refrigerantes em lata de 350ml" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Refrigerantes Lata 350ml</span><span class="card-price">R$5,50</span></div>
+            <p class="card-note">(Coca-cola, Coca-cola Zero e Guaraná)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:2">
+          <div class="card-photo"><img src="img/bebida-agua.webp" alt="Garrafas de água mineral de 500ml, com e sem gás" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <div class="card-row"><span class="card-name">Água 500ml</span><span class="card-price">R$4</span></div>
+            <p class="card-note">(Com ou sem gás)</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="prato-do-dia" class="dailyband">
+    <div class="dailyband-inner">
+      <div class="dailyband-photo reveal">
+        <img src="img/prato-do-dia.webp" alt="Strogonoff de frango com arroz e batata palha — exemplo de prato do dia" loading="lazy" width="900" height="900">
+      </div>
+      <div class="reveal" style="--d:1">
+        <span class="dailyband-label">Prato do dia</span>
+        <p class="dailyband-text">Muda todo dia, pergunte a opção de hoje pelo WhatsApp!</p>
+        <a class="btn btn-primary" href="https://wa.me/5561984390752?text=Ol%C3%A1%2C%20qual%20%C3%A9%20o%20prato%20do%20dia%20de%20hoje%3F" target="_blank" rel="noopener">💬 Perguntar no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="marmitex" class="marmitex">
+    <div class="marmitex-photo reveal">
+      <img src="img/marmitex.webp" alt="Marmitex pronto para viagem" loading="lazy" width="1200" height="1200">
+    </div>
+    <div class="marmitex-copy reveal">
+      <span class="marmitex-title">Marmitex</span>
+      <p>Peça para casa. Fazemos marmitex de todos os pratos do cardápio!</p>
+      <button class="btn btn-primary" type="button" data-open-modal>Faça seu pedido</button>
+    </div>
+  </section>
+
+</main>
+
+<section class="local" aria-labelledby="localTitle">
+  <h2 class="local-title" id="localTitle">Onde estamos</h2>
+  <address class="local-address">
+    Galeria do Edifício Green Park Center<br>
+    Rua 20 Norte — Águas Claras, Brasília&nbsp;-&nbsp;DF
+  </address>
+  <p class="local-hours">🕚 Segunda a Sábado, das 11h às 14h</p>
+  <div class="local-grid">
+    <div class="local-shot reveal" style="--d:0">
+      <img src="img/local-predio.webp" alt="Fachada do Edifício Green Park Center em Águas Claras" loading="lazy" width="900" height="675">
+    </div>
+    <div class="local-shot reveal" style="--d:1">
+      <img src="img/local-placa.webp" alt="Placa da Rua 21 Norte na esquina do Green Park Center" loading="lazy" width="900" height="675">
+    </div>
+    <a class="local-map reveal" style="--d:2" href="https://share.google/F5ouCm4ZDeyrWC4mG" target="_blank" rel="noopener">
+      <img src="img/mapa.webp" alt="Mapa da localização da Cozinha do Rubbinho no Green Park Center" loading="lazy" width="640" height="400">
+      <span class="local-map-label">📍 Abrir rota no Maps</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <img class="footer-logo" src="img/logo.webp" alt="Cozinha do Rubbinho" width="900" height="507" loading="lazy">
+  <a class="footer-phone" href="https://wa.me/5561984390752?text=Ol%C3%A1%2C%20quero%20fazer%20um%20pedido%20na%20Cozinha%20do%20Rubbinho" target="_blank" rel="noopener">💬 61 9 8439-0752</a>
+  <div><button class="btn btn-primary" type="button" data-open-modal>Faça seu pedido</button></div>
+  <p class="footer-meta">Cozinha do Rubbinho — comida caseira em Águas Claras, DF</p>
+</footer>
+
+<div class="fab">
+  <button class="btn btn-primary" type="button" data-open-modal aria-label="Faça seu pedido">🍽️ Pedir</button>
+</div>
+
+<dialog id="orderModal" aria-labelledby="orderModalTitle">
+  <div class="modal-inner">
+    <div class="modal-head">
+      <div>
+        <h2 class="modal-title" id="orderModalTitle">Faça seu pedido</h2>
+        <p class="modal-sub">Escolha como quer falar com a gente</p>
+      </div>
+      <button class="modal-close" type="button" data-close-modal aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-options">
+      <a class="modal-option" href="https://share.google/F5ouCm4ZDeyrWC4mG" target="_blank" rel="noopener">
+        <span class="modal-option-icon" aria-hidden="true">📍</span>
+        <span class="modal-option-text">
+          <strong>Localização do Restaurante</strong>
+          <span>Ver endereço e rota no mapa</span>
+        </span>
+      </a>
+      <!-- TROCAR: link do grupo de marmitas quando o usuário enviar -->
+      <a class="modal-option" href="https://wa.me/5561984390752?text=Ol%C3%A1%2C%20quero%20entrar%20no%20grupo%20de%20marmitas%20da%20Cozinha%20do%20Rubbinho" target="_blank" rel="noopener">
+        <span class="modal-option-icon" aria-hidden="true">💬</span>
+        <span class="modal-option-text">
+          <strong>Entre no grupo de marmitas</strong>
+          <span>Receba o cardápio do dia no WhatsApp</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  "use strict";
+
+  // reveal on scroll
+  var revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold:0.15, rootMargin:'0px 0px -40px 0px' });
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  // topbar fixa e FAB só depois do hero
+  var topbar = document.getElementById('topbar');
+  var fab = document.querySelector('.fab');
+  var hero = document.querySelector('.hero');
+  if('IntersectionObserver' in window && hero){
+    var heroIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var past = !entry.isIntersecting;
+        if(topbar){ topbar.classList.toggle('shown', past); }
+        if(fab){ fab.classList.toggle('shown', past); }
+      });
+    }, { threshold:0, rootMargin:'-10px 0px 0px 0px' });
+    heroIO.observe(hero);
+  } else if(fab){
+    fab.classList.add('shown');
+  }
+
+  // scroll-spy on category nav
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#catnav a'));
+  var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  if('IntersectionObserver' in window && sections.length){
+    var spyIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var id = '#' + entry.target.id;
+        var link = navLinks.find(function(a){ return a.getAttribute('href') === id; });
+        if(!link) return;
+        if(entry.isIntersecting){
+          navLinks.forEach(function(a){ a.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, { threshold:0, rootMargin:'-45% 0px -50% 0px' });
+    sections.forEach(function(s){ spyIO.observe(s); });
+  }
+
+  // modal
+  var modal = document.getElementById('orderModal');
+  var openers = document.querySelectorAll('[data-open-modal]');
+  var closers = document.querySelectorAll('[data-close-modal]');
+  var lastTrigger = null;
+
+  function openModal(e){
+    lastTrigger = e.currentTarget;
+    if(typeof modal.showModal === 'function'){ modal.showModal(); }
+    else { modal.setAttribute('open',''); }
+  }
+  function closeModal(){
+    if(typeof modal.close === 'function'){ modal.close(); }
+    else { modal.removeAttribute('open'); }
+    if(lastTrigger && typeof lastTrigger.focus === 'function'){ lastTrigger.focus(); }
+  }
+  openers.forEach(function(btn){ btn.addEventListener('click', openModal); });
+  closers.forEach(function(btn){ btn.addEventListener('click', closeModal); });
+  modal.addEventListener('click', function(e){ if(e.target === modal){ closeModal(); } });
+  modal.addEventListener('cancel', function(){
+    if(lastTrigger && typeof lastTrigger.focus === 'function'){
+      setTimeout(function(){ lastTrigger.focus(); }, 0);
+    }
+  });
+})();
+</script>
+</body>
+</html>
