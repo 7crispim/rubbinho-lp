@@ -101,24 +101,29 @@
   }
 
   /* ---------- hero (banner é peça fechada: mostrar inteiro) ---------- */
-  /* .hero e .marmitex são <section>: precisam zerar o padding da regra genérica abaixo */
-  .hero{ position:relative; background: var(--ink); padding:0; }
-  .hero-banner{ display:block; }   /* <picture> é inline por padrão e cria um vão abaixo da imagem */
+  /* .hero e .marmitex são <section>: precisam zerar o padding da regra genérica abaixo.
+     O hero ocupa exatamente uma tela: assim só o banner e os botões ficam na
+     primeira dobra, e a barra de categorias começa logo abaixo dela. */
+  .hero{
+    position:relative; background: var(--ink); padding:0;
+    height: 100vh;      /* fallback */
+    height: 100svh;
+  }
+  .hero-banner{ display:block; height:100%; }   /* <picture> é inline por padrão */
   .hero-banner img{
-    width:100%; height:auto;
+    width:100%; height:100%;
+    object-fit: cover;
+    /* corta SÓ pela base: o topo do banner traz o "Águas Claras-DF" e não pode
+       ser cortado; a base é onde o degradê dos botões já cobre a arte. */
+    object-position: 50% 0%;
     opacity:0; animation: fadeUp .9s var(--ease) .05s forwards;
   }
-  /* Desktop: o banner é 1,6:1 e em tela larga fica alto demais, empurrando os
-     botões pra fora da primeira dobra. Limita a altura à viewport e corta pela
-     base — que é onde o degradê escuro dos botões já cobre a arte. */
-  @media (min-width: 46rem){
-    .hero-banner img{
-      height: calc(100svh - 3rem);
-      max-height: 52rem;
-      object-fit: cover;
-      object-position: 50% 38%;
-      min-height: 30rem;
-    }
+  /* No mobile o banner é retrato e proporcionalmente MAIS LARGO que a tela, então
+     "cover" cortaria as laterais e comeria o "Águas Claras-DF" do topo. Aqui ele
+     aparece inteiro, encostado no topo, e o fundo escuro completa a tela embaixo —
+     exatamente onde os botões ficam. */
+  @media (max-width: 46rem){
+    .hero-banner img{ object-fit: contain; object-position: 50% 0%; }
   }
   /* chips + botões sobrepostos na parte de baixo do banner */
   .hero-actions-wrap{
