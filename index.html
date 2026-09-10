@@ -232,43 +232,17 @@
     color:var(--text-light);
     padding:3.6rem 1.4rem;
   }
-  .dailyband-inner{
-    max-width:56rem; margin:0 auto;
-    display:grid; grid-template-columns:1fr; gap:1.8rem; align-items:center;
-    text-align:center; justify-items:center;
-  }
-  .dailyband-photo{
-    width:min(17rem, 70vw); aspect-ratio:1/1; border-radius:50%; overflow:hidden;
-    border:0.3rem solid var(--gold); box-shadow:0 1.4rem 3rem -1rem rgba(0,0,0,0.7);
-  }
-  .dailyband-photo img{ width:100%; height:100%; object-fit:cover; }
+  .dailyband .section-head{ text-align:center; max-width:38rem; margin:0 auto 1.8rem; }
   .dailyband-label{
     font-family:'Caveat', cursive; font-size:2.6rem; color:var(--gold-soft);
     display:block; transform:rotate(-1.5deg); line-height:1;
   }
-  .dailyband-text{ margin:0.6rem 0 1.4rem; font-size:1rem; color:var(--paper-dim); }
-  .daily-list{
-    list-style:none; margin:0 0 1rem; padding:0; width:100%; max-width:34rem;
-    display:flex; flex-direction:column; gap:0.55rem; text-align:left;
+  .dailyband-text{ margin:0.6rem 0 0; font-size:1rem; color:var(--paper-dim); }
+  .card-day{
+    display:block; font-size:0.7rem; font-weight:800; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--red-bright); margin-bottom:0.3rem;
   }
-  .daily-list li{
-    display:grid; grid-template-columns:5.4rem 1fr auto; gap:0.5rem; align-items:baseline;
-    padding-bottom:0.55rem; border-bottom:1px solid rgba(240,207,143,0.18);
-  }
-  .daily-list li:last-child{ border-bottom:none; padding-bottom:0; }
-  .daily-day{ font-weight:800; font-size:0.74rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--gold-soft); }
-  .daily-dish{ font-size:0.95rem; color:var(--text-light); line-height:1.3; }
-  .daily-dish em{ display:block; font-size:0.74rem; color:var(--paper-dim); opacity:0.72; margin-top:0.15rem; }
-  .daily-price{ font-weight:800; color:var(--gold); font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .daily-note{ margin:0 0 1.4rem; font-size:0.78rem; font-style:italic; color:var(--paper-dim); opacity:0.8; max-width:34rem; text-align:left; }
-  @media (max-width: 24rem){
-    .daily-list li{ grid-template-columns:1fr auto; }
-    .daily-day{ grid-column:1 / -1; }
-  }
-  @media (min-width: 46rem){
-    .dailyband-inner{ grid-template-columns: auto 1fr; text-align:left; justify-items:start; gap:2.6rem; }
-    .dailyband-photo{ width:15rem; }
-  }
+  .dailyband-cta{ margin-top:2rem; text-align:center; }
 
   /* ---------- marmitex band ---------- */
   .marmitex{
@@ -607,21 +581,58 @@
   </section>
 
   <section id="prato-do-dia" class="dailyband">
-    <div class="dailyband-inner">
-      <div class="dailyband-photo reveal">
-        <img src="img/prato-do-dia.webp" alt="Strogonoff de frango com arroz e batata palha — exemplo de prato do dia" loading="lazy" width="900" height="900">
-      </div>
-      <div class="reveal" style="--d:1">
+    <div class="container">
+      <div class="section-head reveal">
         <span class="dailyband-label">Prato do dia</span>
         <p class="dailyband-text">Cada dia da semana tem o seu.</p>
-        <ul class="daily-list">
-          <li><span class="daily-day">Segunda</span><span class="daily-dish">Costela ao molho</span><span class="daily-price">R$20</span></li>
-          <li><span class="daily-day">Terça</span><span class="daily-dish">Frango ao molho</span><span class="daily-price">R$20</span></li>
-          <li><span class="daily-day">Quarta</span><span class="daily-dish">Strogonoff de frango<em>arroz e batata palha · com fritas R$30</em></span><span class="daily-price">R$25</span></li>
-          <li><span class="daily-day">Quinta</span><span class="daily-dish">Almôndega ao molho</span><span class="daily-price">R$20</span></li>
-          <li><span class="daily-day">Sexta</span><span class="daily-dish">Feijoada mineira original<em>arroz, couve, torresmo e farofa</em></span><span class="daily-price">R$30</span></li>
-        </ul>
-        <p class="daily-note">Segunda, terça e quinta acompanham arroz, feijão, macarrão, salada e farofa.</p>
+      </div>
+      <div class="grid">
+        <article class="card reveal" style="--d:0">
+          <!-- TROCAR FOTO: foto real deste prato -->
+          <div class="card-photo"><img src="img/bife-acebolado.webp" alt="Costela ao molho com arroz, feijão, macarrão, salada e farofa" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <span class="card-day">Segunda</span>
+            <div class="card-row"><span class="card-name">Costela ao molho</span><span class="card-price">R$20</span></div>
+            <p class="card-note">(Arroz, feijão, macarrão, salada e farofa)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:1">
+          <!-- TROCAR FOTO: foto real deste prato -->
+          <div class="card-photo"><img src="img/frango-completo.webp" alt="Frango ao molho com arroz, feijão, macarrão, salada e farofa" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <span class="card-day">Terça</span>
+            <div class="card-row"><span class="card-name">Frango ao molho</span><span class="card-price">R$20</span></div>
+            <p class="card-note">(Arroz, feijão, macarrão, salada e farofa)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:2">
+          <div class="card-photo"><img src="img/prato-do-dia.webp" alt="Strogonoff de frango com arroz e batata palha" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <span class="card-day">Quarta</span>
+            <div class="card-row"><span class="card-name">Strogonoff de frango</span><span class="card-price">R$25</span></div>
+            <p class="card-note">(Arroz e batata palha · com fritas R$30)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:3">
+          <!-- TROCAR FOTO: foto real deste prato -->
+          <div class="card-photo"><img src="img/parmegiana-carne.webp" alt="Almôndega ao molho com arroz, feijão, macarrão, salada e farofa" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <span class="card-day">Quinta</span>
+            <div class="card-row"><span class="card-name">Almôndega ao molho</span><span class="card-price">R$20</span></div>
+            <p class="card-note">(Arroz, feijão, macarrão, salada e farofa)</p>
+          </div>
+        </article>
+        <article class="card reveal" style="--d:4">
+          <!-- TROCAR FOTO: foto real deste prato -->
+          <div class="card-photo"><img src="img/marmitex.webp" alt="Feijoada mineira com arroz, couve, torresmo e farofa" loading="lazy" width="900" height="900"></div>
+          <div class="card-body">
+            <span class="card-day">Sexta</span>
+            <div class="card-row"><span class="card-name">Feijoada mineira original</span><span class="card-price">R$30</span></div>
+            <p class="card-note">(Arroz, couve, torresmo e farofa)</p>
+          </div>
+        </article>
+      </div>
+      <div class="dailyband-cta reveal">
         <a class="btn btn-primary" href="https://wa.me/5561985905050?text=Ol%C3%A1%2C%20quero%20fazer%20um%20pedido%20na%20Cozinha%20do%20Rubbinho" target="_blank" rel="noopener">💬 Pedir pelo WhatsApp</a>
       </div>
     </div>
