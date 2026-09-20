@@ -23,7 +23,7 @@
     --text-light: #f6ecd9;
     --shadow: 0 1.2rem 2.4rem -1rem rgba(23,17,13,0.35);
     --ease: cubic-bezier(.22,.61,.36,1);
-    --topbar-h: 6.6rem;
+    --topbar-h: 3.6rem;
   }
 
   *{ box-sizing:border-box; }
@@ -75,15 +75,12 @@
   /* ---------- top bar ---------- */
   .topbar{
     position:fixed; top:0; left:0; right:0; z-index:80;
-    display:flex; flex-direction:column; gap:0; padding:0;
+    display:flex; align-items:center; gap:0.9rem;
+    padding:0.55rem 1.1rem;
     background: rgb(23,17,13);
     border-bottom:1px solid rgba(217,164,65,0.25);
   }
-  .topbar-main{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:1rem; padding:0.7rem 1.4rem 0.6rem;
-  }
-  .topbar-brand{ display:flex; align-items:center; gap:0.6rem; text-decoration:none; min-width:0; }
+  .topbar-brand{ display:flex; align-items:center; gap:0.6rem; text-decoration:none; min-width:0; flex:none; }
   .topbar-brand img{ height:2.1rem; width:auto; flex:none; }
   .topbar-brand span{
     font-family:'Anton', sans-serif; color:var(--text-light);
@@ -98,9 +95,18 @@
     transition: transform .2s var(--ease), background .2s var(--ease);
   }
   .topbar-cta:hover{ background:var(--red-bright); transform:translateY(-1px); }
+  @media (max-width: 62rem){
+    .topbar-brand span{ display:none; }
+  }
   @media (max-width: 30rem){
-    .topbar-brand span{ font-size:0.8rem; }
-    .topbar-cta{ font-size:0.72rem; padding:0.5rem 0.85rem; }
+    .topbar{ gap:0.55rem; padding:0.5rem 0.8rem; }
+    .topbar-brand img{ height:1.8rem; }
+    .catnav a{ font-size:0.76rem; padding:0.42rem 0.7rem; }
+    .topbar-cta{ font-size:0.72rem; padding:0.48rem 0.8rem; }
+    .topbar-cta .cta-long{ display:none; }
+  }
+  @media (min-width: 30.01rem){
+    .topbar-cta .cta-short{ display:none; }
   }
 
   /* ---------- hero (banner é peça fechada: mostrar inteiro) ---------- */
@@ -169,10 +175,10 @@
 
   /* ---------- category nav ---------- */
   .catnav{
-    display:flex; gap:0.4rem; overflow-x:auto;
-    padding:0.5rem 1.4rem 0.7rem;
-    border-top:1px solid rgba(240,236,217,0.1);
-    scrollbar-width:none;
+    flex:1 1 auto; min-width:0;
+    display:flex; gap:0.3rem; overflow-x:auto;
+    padding:0; scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
   }
   .catnav::-webkit-scrollbar{ display:none; }
   .catnav a{
@@ -425,13 +431,10 @@
 <a class="skip-link" href="#cardapio">Pular para o cardápio</a>
 
 <header class="topbar" id="topbar">
-  <div class="topbar-main">
-    <a class="topbar-brand" href="#top">
-      <img src="img/logo.webp" alt="" width="900" height="484">
-      <span>Cozinha do Rubbinho</span>
-    </a>
-    <button class="topbar-cta" type="button" data-open-modal>Faça seu pedido</button>
-  </div>
+  <a class="topbar-brand" href="#top">
+    <img src="img/logo.webp" alt="" width="900" height="484">
+    <span>Cozinha do Rubbinho</span>
+  </a>
   <nav class="catnav" id="catnav" aria-label="Categorias do cardápio">
     <a href="#executivos">Executivos</a>
     <a href="#parmegianas">Parmegianas</a>
@@ -440,6 +443,7 @@
     <a href="#prato-do-dia">Prato do dia</a>
     <a href="#marmitex">Marmitex</a>
   </nav>
+  <button class="topbar-cta" type="button" data-open-modal><span class="cta-long">Faça seu pedido</span><span class="cta-short">Pedir</span></button>
 </header>
 
 <div id="top"></div>
@@ -618,7 +622,7 @@
   <section id="prato-do-dia" class="dailyband">
     <div class="dailyband-inner">
       <div class="dailyband-photo reveal">
-        <img src="img/prato-do-dia.webp" alt="Strogonoff de frango com arroz e batata palha — exemplo de prato do dia" loading="lazy" width="900" height="900">
+        <img src="img/feijoada.webp" alt="Feijoada mineira com arroz, couve, farofa e torresmo" loading="lazy" width="900" height="900">
       </div>
       <div class="reveal" style="--d:1">
         <span class="dailyband-label">Prato do dia</span>
