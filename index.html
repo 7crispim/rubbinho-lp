@@ -847,20 +847,35 @@
   // scroll-spy on category nav
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('#catnav a'));
   var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
-  if('IntersectionObserver' in window && sections.length){
-    var spyIO = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        var id = '#' + entry.target.id;
-        var link = navLinks.find(function(a){ return a.getAttribute('href') === id; });
-        if(!link) return;
-        if(entry.isIntersecting){
-          navLinks.forEach(function(a){ a.classList.remove('active'); });
-          link.classList.add('active');
-        }
-      });
-    }, { threshold:0, rootMargin:'-45% 0px -50% 0px' });
-    sections.forEach(function(s){ spyIO.observe(s); });
+  var heroEl = document.querySelector('.hero');
+
+  /* Scroll-spy por medicao direta, nao por IntersectionObserver.
+     O IO reportava entradas em lote e fora de ordem quando a rolagem dava
+     saltos: as vezes nenhuma categoria marcava, as vezes a ultima ficava
+     grudada ao voltar pro topo. Aqui a regra e explicita: existe uma linha
+     de leitura logo abaixo do header; se o banner ainda cobre essa linha,
+     nada fica marcado; senao marca a secao que a linha estiver cruzando. */
+  function updateSpy(){
+    if(!navLinks.length) return;
+    var linha = (topbar ? topbar.offsetHeight : 0) + Math.round(window.innerHeight * 0.18);
+    var alvo = null;
+
+    if(!(heroEl && heroEl.getBoundingClientRect().bottom > linha)){
+      for(var i = 0; i < sections.length; i++){
+        var r = sections[i].getBoundingClientRect();
+        if(r.top <= linha && r.bottom > linha){ alvo = navLinks[i]; break; }
+      }
+    }
+    navLinks.forEach(function(a){ a.classList.toggle('active', a === alvo); });
   }
+
+  /* chamada direta, sem requestAnimationFrame: sao seis medicoes baratas, e
+     o rAF nao roda quando a aba esta em segundo plano, o que deixava a
+     marcacao velha ao voltar pra aba. */
+  window.addEventListener('scroll', updateSpy, { passive:true });
+  window.addEventListener('resize', updateSpy);
+  window.addEventListener('load', updateSpy);
+  updateSpy();
 
   // modal
   var modal = document.getElementById('orderModal');
