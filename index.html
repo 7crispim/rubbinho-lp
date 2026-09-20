@@ -180,6 +180,10 @@
     padding:0; scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
   }
+  /* empurra o menu pra junto do botão vermelho. margin auto vira zero
+     quando o espaço acaba, então nenhum item some fora de alcance —
+     diferente de justify-content:flex-end, que esconde os primeiros. */
+  .catnav a:first-child{ margin-left:auto; }
   .catnav::-webkit-scrollbar{ display:none; }
   .catnav a{
     flex:none; text-decoration:none; white-space:nowrap;
