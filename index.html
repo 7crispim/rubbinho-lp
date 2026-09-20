@@ -98,14 +98,13 @@
   @media (max-width: 62rem){
     .topbar-brand span{ display:none; }
   }
-  @media (max-width: 30rem){
-    .topbar{ gap:0.55rem; padding:0.5rem 0.8rem; }
+  @media (max-width: 26rem){
+    .topbar{ gap:0.5rem; padding:0.5rem 0.8rem; }
     .topbar-brand img{ height:1.8rem; }
-    .catnav a{ font-size:0.76rem; padding:0.42rem 0.7rem; }
-    .topbar-cta{ font-size:0.72rem; padding:0.48rem 0.8rem; }
+    .topbar-cta{ font-size:0.74rem; padding:0.5rem 0.85rem; }
     .topbar-cta .cta-long{ display:none; }
   }
-  @media (min-width: 30.01rem){
+  @media (min-width: 26.01rem){
     .topbar-cta .cta-short{ display:none; }
   }
 
@@ -131,8 +130,15 @@
      "cover" cortaria as laterais e comeria o "Águas Claras-DF" do topo. Aqui ele
      aparece inteiro, encostado no topo, e o fundo escuro completa a tela embaixo —
      exatamente onde os botões ficam. */
+  /* No mobile o banner é mais largo (0.563) que a tela (0.491): com "cover" as
+     laterais seriam cortadas e comeriam o "Águas Claras-DF"; com "contain" numa
+     altura fixa sobrava uma faixa preta embaixo, e os botões caíam nela em vez de
+     ficar sobre a arte. A saída é a altura do hero seguir a do próprio banner. */
   @media (max-width: 46rem){
-    .hero-banner img{ object-fit: contain; object-position: 50% 0%; }
+    .hero{ height:auto; }
+    .hero-banner{ height:auto; }
+    .hero-banner img{ height:auto; object-fit: contain; object-position: 50% 0%; }
+    .hero-actions-wrap{ padding: 3.5rem 1.1rem 1.3rem; }
   }
   /* chips + botões sobrepostos na parte de baixo do banner */
   .hero-actions-wrap{
@@ -185,6 +191,46 @@
      diferente de justify-content:flex-end, que esconde os primeiros. */
   .catnav a:first-child{ margin-left:auto; }
   .catnav::-webkit-scrollbar{ display:none; }
+  .catnav-toggle{
+    display:none; flex:none; margin-left:auto;
+    width:2.4rem; height:2.4rem; padding:0;
+    align-items:center; justify-content:center;
+    background:transparent; border:1px solid rgba(240,207,143,0.45);
+    border-radius:0.7rem; cursor:pointer;
+  }
+  .catnav-toggle span{
+    display:block; position:relative;
+    width:1.05rem; height:2px; border-radius:2px; background:var(--gold-soft);
+  }
+  .catnav-toggle span::before,
+  .catnav-toggle span::after{
+    content:''; position:absolute; left:0; width:100%; height:2px;
+    border-radius:2px; background:var(--gold-soft);
+    transition: transform .25s var(--ease), opacity .2s var(--ease);
+  }
+  .catnav-toggle span::before{ top:-0.37rem; }
+  .catnav-toggle span::after{ top:0.37rem; }
+  .topbar.nav-open .catnav-toggle span{ background:transparent; }
+  .topbar.nav-open .catnav-toggle span::before{ transform: translateY(0.37rem) rotate(45deg); }
+  .topbar.nav-open .catnav-toggle span::after{ transform: translateY(-0.37rem) rotate(-45deg); }
+
+  /* No celular não cabem 6 categorias na mesma linha: viram um painel
+     aberto pelo botão de três traços. */
+  @media (max-width: 46rem){
+    .catnav-toggle{ display:flex; }
+    .catnav{
+      position:absolute; top:100%; left:0; right:0;
+      flex-direction:column; gap:0.15rem;
+      padding:0.6rem 1rem 0.9rem; overflow:visible;
+      background: rgb(23,17,13);
+      border-bottom:1px solid rgba(217,164,65,0.25);
+      box-shadow:0 1.2rem 1.8rem -1rem rgba(0,0,0,0.85);
+      display:none;
+    }
+    .topbar.nav-open .catnav{ display:flex; }
+    .catnav a,
+    .catnav a:first-child{ margin-left:0; font-size:0.95rem; padding:0.7rem 0.8rem; border-radius:0.6rem; }
+  }
   .catnav a{
     flex:none; text-decoration:none; white-space:nowrap;
     font-size:0.82rem; font-weight:600; color:var(--paper-dim);
@@ -439,6 +485,10 @@
     <img src="img/logo.webp" alt="" width="900" height="484">
     <span>Cozinha do Rubbinho</span>
   </a>
+  <button class="catnav-toggle" id="catnavToggle" type="button"
+          aria-controls="catnav" aria-expanded="false" aria-label="Abrir categorias do cardápio">
+    <span aria-hidden="true"></span>
+  </button>
   <nav class="catnav" id="catnav" aria-label="Categorias do cardápio">
     <a href="#executivos">Executivos</a>
     <a href="#parmegianas">Parmegianas</a>
@@ -747,6 +797,38 @@
   window.addEventListener('resize', syncTopbarHeight);
   if('ResizeObserver' in window && topbar){ new ResizeObserver(syncTopbarHeight).observe(topbar); }
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(syncTopbarHeight); }
+
+  // menu de categorias no celular
+  var navToggle = document.getElementById('catnavToggle');
+  var catnav = document.getElementById('catnav');
+  function setNav(open){
+    if(!topbar || !navToggle) return;
+    topbar.classList.toggle('nav-open', open);
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    navToggle.setAttribute('aria-label', open ? 'Fechar categorias do cardápio' : 'Abrir categorias do cardápio');
+  }
+  if(navToggle){
+    navToggle.addEventListener('click', function(){
+      setNav(!topbar.classList.contains('nav-open'));
+    });
+  }
+  if(catnav){
+    catnav.addEventListener('click', function(e){
+      if(e.target.tagName === 'A'){ setNav(false); }
+    });
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && topbar && topbar.classList.contains('nav-open')){
+      setNav(false);
+      if(navToggle){ navToggle.focus(); }
+    }
+  });
+  document.addEventListener('click', function(e){
+    if(topbar && topbar.classList.contains('nav-open') && !topbar.contains(e.target)){ setNav(false); }
+  });
+  window.addEventListener('resize', function(){
+    if(window.innerWidth > 736){ setNav(false); }
+  });
 
   // FAB só depois do hero
   var fab = document.querySelector('.fab');
